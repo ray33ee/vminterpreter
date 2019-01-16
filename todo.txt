@@ -1,0 +1,3 @@
+
+ - How do I pass parameters, on the stack or with registers? what if i need to preserve registers on the stack>
+ - Which math functions should set the flags? Integer only, or floating too?
