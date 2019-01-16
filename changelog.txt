@@ -1,4 +1,8 @@
 
+Version 1.0.2
+	- Functions added (except dev and pow)
+	- Implemented setup and loop control flow
+
 Version 1.0.1
 	- Redesigned code to use iostream for input file
 	- VM now only loads instructions on a need-to-use basis, instead of loading entrie program into memory
