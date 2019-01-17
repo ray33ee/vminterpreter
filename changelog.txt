@@ -1,3 +1,5 @@
+Version 1.0.3
+	- Iterator proof of concept complete
 
 Version 1.0.2
 	- Functions added (except dev and pow)

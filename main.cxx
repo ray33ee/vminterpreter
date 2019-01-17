@@ -27,13 +27,24 @@
 #include <stdio.h> //printf
 #include <cstdlib> //std::rand
 #include <ctime> //std::time
+#include <list> //std::list - linked list
 
 #include "functions.h"
+#include "physics.h"
 
 const int REGISTER_COUNT = 30;
 
+std::list<PhysicsObject>::iterator iteratorConvert(int num)
+{
+	return *(std::list<PhysicsObject>::iterator*)&num;
+}
 
-int start_machine(std::ifstream* file, int* registers, Flags* flags)
+int iteratorConvert(std::list<PhysicsObject>::iterator it)
+{
+	return *(int*)&it;
+}
+
+int start_machine(std::ifstream* file, int* registers, Flags* flags, std::list<PhysicsObject>* phys)
 {
 	using namespace std;
 	
@@ -47,6 +58,8 @@ int start_machine(std::ifstream* file, int* registers, Flags* flags)
 		
 		//Buffer for arguments
 		int args[20];
+		
+		list<PhysicsObject>::iterator it;
 		
 		//Fetch opcode
 		file->read((char*)&fetch, sizeof(fetch));
@@ -129,6 +142,11 @@ int start_machine(std::ifstream* file, int* registers, Flags* flags)
 				break;
 			case 0x0113:
 				instr_test_vv(args, registers, flags);
+				break;
+			case 0x0114:
+				it = iteratorConvert(registers[args[0]]);
+				
+				printf("    %f %f %f\n", it->getMass(), it->getXPos(), it->getYPos());
 				break;
 				
 				
@@ -273,6 +291,13 @@ int start_machine(std::ifstream* file, int* registers, Flags* flags)
 				instr_mul_vf_vf_lf(args, registers, flags);
 				break;
 				
+				
+				
+			case 0x0400:
+			
+				registers[args[0]] = iteratorConvert(phys->insert(phys->end(), PhysicsObject(1.0f, Vector2f(0.4f, 0.0f))));
+				break;
+				
 			default:
 				printf("Error: Bytecode 0x%08X not recognised. Aborting VM\n", fetch);
 				return 1;
@@ -321,9 +346,14 @@ void validator()
 int main(int argc, char **argv)
 {
 	using namespace std;
+	
 	char* setup_path = argv[1];
 	char* loop_path = argv[2];
+	
 	int registers[30];
+	
+	list<PhysicsObject> phys_obj;
+	
 	ifstream setup(setup_path, ifstream::binary);
 	ifstream loop(loop_path, ifstream::binary);
 	
@@ -339,14 +369,14 @@ int main(int argc, char **argv)
 	}
 	
 	cout << "START SETUP ROUTINE" << endl;
-	if (start_machine(&setup, registers, &flags))
+	if (start_machine(&setup, registers, &flags, &phys_obj))
 		return 1;
 		
 	cout << "START LOOP ROUTING" << endl;
 	
 	for (int i = 0; i < 10; ++i)
 	{
-		if (start_machine(&loop, registers, &flags))
+		if (start_machine(&loop, registers, &flags, &phys_obj))
 			return 1;
 	}
 	

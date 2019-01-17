@@ -6,3 +6,5 @@
  - Add pow and div functions
  
  - Verify cmp, sub, mul, div, test and pow functions
+
+ - Create class and implement physics objects, update on each loop, store in linked list etc.
